@@ -78,17 +78,16 @@ function handleOperator(nextOperator) {
 }
 
 function calculate(expression) {
-    const regex = /(\d+\.?\d*)([\+\-\*\/])(\d+\.?\d*)/;
-    const match = regex.exec(expression);
-    
-    if (!match) {
-      return parseFloat(expression);
+    let regex = /(\d+\.?\d*)([\+\-\*\/]?)(\d+\.?\d*)/;
+    let match = regex.exec(expression);
+    while (match) {
+        const [fullMatch, a, operator, b] = match;
+        const result = operate(operator, parseFloat(a), parseFloat(b));
+        expression = expression.replace(fullMatch, result.toString());
+        match = regex.exec(expression);
     }
-    
-    const [fullMatch, a, operator, b] = match;
-    const result = operate(operator, parseFloat(a), parseFloat(b));
-    const remainingExpression = expression.replace(fullMatch, result.toString());
-    return calculate(remainingExpression);
+
+    return parseFloat(expression);
 }
 
 const buttons = document.querySelectorAll('button');
@@ -131,8 +130,22 @@ buttons.forEach(button => {
             displayValue = calculate(displayValue);
             updateDisplay();
         }
+        if (button.classList.contains('parenthesis')) {
+            displayValue = inputParenthesis(button.textContent);
+            updateDisplay();
+        }
     });
 });
+
+function inputParenthesis(parenthesis) {
+    if (waitingForSecondOperand) {
+        displayValue = parenthesis;
+        waitingForSecondOperand = false;
+    } else {
+        displayValue = displayValue === '0' ? parenthesis : displayValue + parenthesis;
+    }
+    return displayValue;
+}
 
 function inputNumber(number) {
     if (waitingForSecondOperand) {

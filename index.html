@@ -6,83 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script defer type="text/javascript" src="./index.js"></script>
     <link rel="stylesheet" href="index.css"/>
-    <title>Document</title>
-    <style>
-		body {
-			font-family: Arial, sans-serif;
-			background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-		}
-		#calculator {
-			margin: 0 auto;
-			padding: 10px;
-			border-radius: 10px;
-			background-color: #ddd;
-			box-shadow: 0px 0px 10px #aaa;
-			width: 400px;
-			height: 500px;
-			display: grid;
-			grid-template-columns: repeat(4, 1fr);
-			grid-gap: 5px;
-			align-items: center;
-			justify-content: center;
-			text-align: center;
-		}
-		#display {
-			grid-column: 1 / -1;
-			background-color: #fff;
-			font-size: 2em;
-			padding: 10px;
-			text-align: right;
-			overflow: hidden;
-		}
-		.button {
-			font-size: 1.5em;
-			padding: 10px;
-			background-color: #fff;
-			border-radius: 5px;
-			box-shadow: 0px 0px 5px #aaa;
-			cursor: pointer;
-		}
-		.button:hover {
-			background-color: #f5f5f5;
-		}
-		.operator {
-			background-color: #ff8c00;
-			color: #fff;
-		}
-		#equals {
-			background-color: #4caf50;
-			color: #fff;
-		}
-		#clear {
-			background-color: #f44336;
-			color: #fff;
-		}
-	</style>
+    <title>Calculator</title>
 </head>
 <body>
     <div class="calculator">
         <div class="display">0</div>
+		<button class="parenthesis">(</button>
+		<button class="parenthesis">)</button>
         <button class="clear">C</button>
         <button class="backspace">&larr;</button>
-        <button class="operator">+</button>
-        <button class="operator">-</button>
         <button class="number">7</button>
         <button class="number">8</button>
-        <button class="number">9</button>
-        <button class="operator">/</button>
+		<button class="number">9</button>
+		<button class="operator">+</button>
         <button class="number">4</button>
         <button class="number">5</button>
         <button class="number">6</button>
-        <button class="operator">*</button>
+		<button class="operator">-</button>
         <button class="number">1</button>
         <button class="number">2</button>
         <button class="number">3</button>
+		<button class="operator">/</button>
         <button class="equals">=</button>
-		<button class="number decimal">.</button>
 		<button class="number">0</button>
+		<button class="number decimal">.</button>
+		<button class="operator">*</button>
       </div>      
 </body>
 </html>
