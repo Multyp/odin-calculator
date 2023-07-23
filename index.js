@@ -78,16 +78,95 @@ function handleOperator(nextOperator) {
 }
 
 function calculate(expression) {
-    let regex = /(\d+\.?\d*)([\+\-\*\/]?)(\d+\.?\d*)/;
-    let match = regex.exec(expression);
-    while (match) {
-        const [fullMatch, a, operator, b] = match;
-        const result = operate(operator, parseFloat(a), parseFloat(b));
-        expression = expression.replace(fullMatch, result.toString());
-        match = regex.exec(expression);
+  const precedence = {
+    '(': 3,
+    '+': 1,
+    '-': 1,
+    '*': 2,
+    '/': 2,
+  };
+
+  const isOperator = (token) => token in precedence;
+  const applyOperator = (operator, b, a) => {
+    switch (operator) {
+      case '+':
+        return a + b;
+      case '-':
+        return a - b;
+      case '*':
+        return a * b;
+      case '/':
+        if (b === 0) {
+          throw new Error("Division by zero");
+        }
+        return a / b;
+      default:
+        throw new Error(`Unknown operator: ${operator}`);
+    }
+  };
+
+  const infixToPostfix = (tokens) => {
+    const output = [];
+    const operatorStack = [];
+
+    for (const token of tokens) {
+      if (!isNaN(token)) {
+        output.push(parseFloat(token));
+      } else if (isOperator(token)) {
+        while (
+          operatorStack.length > 0 &&
+          operatorStack[operatorStack.length - 1] !== '(' &&
+          precedence[token] <= precedence[operatorStack[operatorStack.length - 1]]
+        ) {
+          output.push(operatorStack.pop());
+        }
+        operatorStack.push(token);
+      } else if (token === '(') {
+        operatorStack.push(token);
+      } else if (token === ')') {
+        while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== '(') {
+          output.push(operatorStack.pop());
+        }
+        if (operatorStack.length === 0 || operatorStack[operatorStack.length - 1] !== '(') {
+          throw new Error("Mismatched parentheses");
+        }
+        operatorStack.pop();
+      } else {
+        throw new Error(`Invalid token: ${token}`);
+      }
     }
 
-    return parseFloat(expression);
+    while (operatorStack.length > 0) {
+      if (operatorStack[operatorStack.length - 1] === '(') {
+        throw new Error("Mismatched parentheses");
+      }
+      output.push(operatorStack.pop());
+    }
+
+    return output;
+  };
+
+  const tokens = expression.match(/(\d+\.?\d*|-\d+\.?\d*|\+|\-|\*|\/|\(|\))/g);
+  const postfixExpression = infixToPostfix(tokens);
+
+  const operandStack = [];
+  for (const token of postfixExpression) {
+    if (!isNaN(token)) {
+      operandStack.push(token);
+    } else if (isOperator(token)) {
+      const b = operandStack.pop();
+      const a = operandStack.pop();
+      operandStack.push(applyOperator(token, b, a));
+    } else {
+      throw new Error(`Invalid token: ${token}`);
+    }
+  }
+
+  if (operandStack.length !== 1) {
+    throw new Error("Invalid expression");
+  }
+
+  return operandStack[0];
 }
 
 const buttons = document.querySelectorAll('button');
@@ -130,22 +209,13 @@ buttons.forEach(button => {
             displayValue = calculate(displayValue);
             updateDisplay();
         }
+
         if (button.classList.contains('parenthesis')) {
-            displayValue = inputParenthesis(button.textContent);
-            updateDisplay();
+            inputParenthesis(button.textContent);
+            updateDisplay()
         }
     });
 });
-
-function inputParenthesis(parenthesis) {
-    if (waitingForSecondOperand) {
-        displayValue = parenthesis;
-        waitingForSecondOperand = false;
-    } else {
-        displayValue = displayValue === '0' ? parenthesis : displayValue + parenthesis;
-    }
-    return displayValue;
-}
 
 function inputNumber(number) {
     if (waitingForSecondOperand) {
@@ -173,6 +243,11 @@ function inputOperator(nextOperator) {
     updateDisplay();
 }
 
+function inputParenthesis(parenthesis) {
+    displayValue += parenthesis;
+    updateDisplay();
+}
+
 function clearAll() {
     displayValue = '0';
     operator = '';
@@ -189,6 +264,3 @@ function updateDisplay() {
     const display = document.querySelector('.display');
     display.textContent = displayValue;
 }
-
-
-    
